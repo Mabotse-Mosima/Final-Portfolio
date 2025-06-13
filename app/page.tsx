@@ -155,15 +155,36 @@ const projects = [
     featured: true,
   },
   {
-    id: 7,
+    id: 8,
     title: "StackSubChatBot",
     description:
-      "he platform promotes a free 15-day trial with no credit card required, making it easy for users to get started. With a modern, user-friendly interface and a focus on simplifying communication, StackSubstitute helps businesses improve customer support through intelligent, automated interactions.",
+      "The platform promotes a free 15-day trial with no credit card required, making it easy for users to get started. With a modern, user-friendly interface and a focus on simplifying communication, StackSubstitute helps businesses improve customer support through intelligent, automated interactions.",
     image: "/images/stack.png",
     tags: ["HTML5", "CSS", "JavaScript", "bootstrap"],
     liveUrl: "https://sage-capybara-70004a.netlify.app/",
     githubUrl: "https://github.com/Mabotse-Mosima/StackSubChatBot",
     // featured: false,
+  },
+  {
+    id: 9,
+    title: "Serene",
+    description: "An AI-powered mental health companion that listens, supports, and talks to you when you need someone most",
+    image: "/images/Capture.png",
+    tags: ["TypeScript", "React", "Next.js", "Tailwind"],
+    liveUrl: "https://v0-new-project-1by3kcnk7kn.vercel.app/",
+    githubUrl: "https://github.com/Mabotse-Mosima/serene",
+    inProgress: true,
+  },
+  {
+    id: 10,
+    title: "Fake News/Emotion Detect",
+    description:
+      "The Fake News/Emotion Detection App is an AI-powered tool designed to identify misleading information and analyze emotional tone in text or facial expressions.",
+    image: "/images/Capture1.png",
+    tags: ["React", "TypeScript", "Tailwind", "face-api.js"],
+    liveUrl: "https://v0-new-project-geycozpejen.vercel.app/",
+    githubUrl: "https://github.com/Mabotse-Mosima/Fake-News-Emotion-Detect/tree/main",
+    inProgress: true,
   },
 ]
 

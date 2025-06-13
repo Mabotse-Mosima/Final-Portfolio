@@ -3,15 +3,17 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
-import { Send, X, MessageCircle } from "lucide-react";
+import { Send, X, MessageCircle, User, Bot, ExternalLink, Github, Linkedin, Twitter, Mail, Phone, MapPin } from "lucide-react";
 import Image from "next/image";
 
 type ChatMessage = {
   text: string;
   isBot: boolean;
+  timestamp?: Date;
+  links?: Array<{ text: string; url?: string; type?: 'demo' | 'github' | 'social' }>;
 };
 
-// Christinah's Information Database
+// Enhanced Christinah's Information Database
 const christinahInfo = {
   name: "Christinah Mmabotse Mosima",
   title: "Software Engineer & AI Enthusiast",
@@ -24,14 +26,14 @@ const christinahInfo = {
       period: "2021 - 2021",
     },
     {
-      institution: "Cape Peninsula University of Technology",
+      institution: "Cape Peninsula University of Technology", 
       qualification: "Diploma in Information Communication and Technology Application Development",
       period: "2022 - 2024",
     },
     {
       institution: "Cape Peninsula University of Technology",
-      qualification: "Advance Diploma in Information Communication and Technology Application Development",
-      period: "in Progress",
+      qualification: "Advanced Diploma in Information Communication and Technology Application Development",
+      period: "In Progress",
     }
   ],
   skills: ["Java", "JavaScript/TypeScript", "Python", "React & Node.js", ".Net", "UI/UX", "Machine Learning", "Deep Learning", "Natural Language Processing"],
@@ -41,14 +43,14 @@ const christinahInfo = {
       name: "Florist Web Application",
       description: "Built with Angular & Spring Boot, this app lets users order flowers online while admins manage products and orders through a secure dashboard.",
       technologies: ["TypeScript", "Bootstrap", "Java Spring Boot", "Postman", "MySQL"],
-      link: "florist-enterprise.netlify.app",
+      link: "https://florist-enterprise.netlify.app",
       github: "https://github.com/Mabotse-Mosima/Florist-Web-Application-Client-Side"
     },
     {
-      name: "UX/UI Design",
+      name: "UX/UI Design Portfolio",
       description: "Designed clean, modern, and user-friendly interfaces for the florist web app using Figma. Focused on intuitive user flows, responsive layouts, and consistent branding.",
       technologies: ["Figma", "Wire Frame", "UI/UX Design"],
-      link: "https://www.figma.com/design/NoUzkrZyA0bV4hUCiimFfW/MY-PROJECT?node-id=151-1530&t=o726sTO8DmxnYSGI-1"
+      link: "https://www.figma.com/design/NoUzkrZyA0bV4hUCiimFfW/MY-PROJECT?node-id=151-1530&t=o726sTO8DmxnYSGI-1",
     },
     {
       name: "Chirper",
@@ -60,14 +62,14 @@ const christinahInfo = {
       name: "Brilliance Tutoring App",
       description: "A simple web interface that lets users choose their role Tutor, Student, or Parent to get started. Built with HTML and CSS.",
       technologies: ["HTML5", "Bootstrap", "JavaScript"],
-      link: "luxury-alfajores-5e5439.netlify.app",
+      link: "https://luxury-alfajores-5e5439.netlify.app",
       github: "https://github.com/Mabotse-Mosima/Brilliance-Tutoring-App"
     },
     {
       name: "CAPACITI Chatbot",
       description: "Built using Dialogflow and web technologies, the CAPACITI chatbot helps users access program info, check eligibility, and get support anytime, anywhere.",
       technologies: ["Landbot", "Dialogflow", "Google Sheets"],
-      link: "https://landbot.online/v3/H-2887443-EXZMG8X4EBYYN2IT/index.html"
+      link: "https://landbot.online/v3/H-2887443-EXZMG8X4EBYYN2IT/index.html",
     },
     {
       name: "JobSwipers",
@@ -89,168 +91,263 @@ const christinahInfo = {
   status: "Open to opportunities"
 };
 
+const quickQuestions = [
+  "Tell me about her background",
+  "What are her technical skills?",
+  "Show me her projects",
+  "What's her education?",
+  "How can I contact her?",
+  "What's her experience?"
+];
+
 export const ChristinahChatbot = () => {
   const [chatOpen, setChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-    {
-      text: "Hi! I'm here to help you learn more about Christinah Mmabotse Mosima. Feel free to ask me about her background, skills, experience, or projects!",
-      isBot: true,
-    },
-  ]);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  {
+    text: "👋 Hi there! I'm CMM ChatBot, your guide to learning about Christinah Mmabotse Mosima.\n\n✨ I can tell you about her:\n• Background & Experience\n• Technical Skills & Tools\n• Projects & Portfolio\n• Education & Qualifications\n• Contact Information\n\nWhat would you like to know first?",
+    isBot: true,
+    timestamp: new Date(),
+  },
+]);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to bottom of chat
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages]);
 
-  // Chatbot Response System
-const getResponse = (message: string): string => {
-    const lowerMessage = message.toLowerCase();
+const getResponse = (message: string): { text: string; links?: Array<{ text: string; url?: string; type?: 'demo' | 'github' | 'social' }> } => {  const lowerMessage = message.toLowerCase();
 
-    // Address/Location responses
-    if (lowerMessage.includes("location") || lowerMessage.includes("address")) {
-      return `Christinah is based in:\n
-📍 ${christinahInfo.contact.location}\n
-Contact:\n
-📧 ${christinahInfo.contact.email}
-📱 ${christinahInfo.contact.phone}`;
-    }
     // Greeting responses
-    if (lowerMessage.includes("hello") || lowerMessage.includes("hi") || lowerMessage.includes("hey")) {
+    if (lowerMessage.includes("hello") || lowerMessage.includes("hi") || lowerMessage.includes("hey") || lowerMessage.includes("good")) {
       const greetings = [
-        `Hi! I'm here to tell you about ${christinahInfo.name}. What would you like to know?`,
-        `Hello! I can share information about Christinah's background, skills, and experience. How can I help?`,
-        `Welcome! I'm here to help you learn more about ${christinahInfo.name}. What interests you?`,
+        `Hello! 😊 I'm excited to tell you about ${christinahInfo.name}. She's a talented software engineer with a passion for AI.\n\nWhat aspect of her profile interests you most?`,
+        `Hi there! 👋 Welcome to Christinah's interactive profile. I can share details about her technical expertise, projects, or background.\n\nWhat would you like to explore?`,
+        `Hey! 🌟 Great to meet you! I'm here to showcase Christinah's amazing journey in software engineering and AI.\n\nFeel free to ask me anything about her!`,
       ];
-      return greetings[Math.floor(Math.random() * greetings.length)];
+      return { text: greetings[Math.floor(Math.random() * greetings.length)] };
     }
 
-    // About responses
-    if (lowerMessage.includes("about") || lowerMessage.includes("who is") || lowerMessage.includes("tell me about")) {
-      const aboutResponses = [
-        `${christinahInfo.name} is a ${christinahInfo.title.toLowerCase()}. ${christinahInfo.description}`,
-        `Christinah is an experienced software engineer with ${christinahInfo.experience.toLowerCase()}. She's passionate about AI and currently building expertise in machine learning and deep learning.`,
-      ];
-      return aboutResponses[Math.floor(Math.random() * aboutResponses.length)];
+    // About/Background responses
+    if (lowerMessage.includes("about") || lowerMessage.includes("who is") || lowerMessage.includes("background") || lowerMessage.includes("tell me about")) {
+      return {
+        text: `🌟 Meet ${christinahInfo.name}\n\n${christinahInfo.title}\n\n${christinahInfo.description}\n\n💼 ${christinahInfo.experience}\n🎯 ${christinahInfo.status}\n📍 Based in ${christinahInfo.contact.location}\n\nShe's passionate about leveraging technology to solve real-world problems and is particularly excited about the potential of AI to transform industries.`,
+        links: [
+          { text: "View LinkedIn Profile", url: christinahInfo.contact.linkedin, type: "social" },
+          { text: "Check GitHub", url: christinahInfo.contact.github, type: "social" }
+        ]
+      };
     }
 
     // Skills responses
-    if (lowerMessage.includes("skill") || lowerMessage.includes("technology") || lowerMessage.includes("tech stack")) {
-      return `Christinah's technical skills include: ${christinahInfo.skills.join(", ")}. She's particularly focused on AI and machine learning technologies.`;
+    if (lowerMessage.includes("skill") || lowerMessage.includes("technology") || lowerMessage.includes("tech stack") || lowerMessage.includes("technical")) {
+      return {
+        text: `💻 Christinah's Technical Arsenal\n\n🔧 Core Programming Languages:\n${christinahInfo.skills.slice(0, 5).map(skill => `• ${skill}`).join('\n')}\n\n🤖 AI & Machine Learning:\n• Machine Learning\n• Deep Learning\n• Natural Language Processing\n• TensorFlow & PyTorch\n\n🎨 Design & Frontend:\n• UI/UX Design\n• React & Angular\n• Bootstrap & Tailwind CSS\n\nShe's constantly learning and staying up-to-date with the latest technologies in software development and AI!`
+      };
     }
 
     // Tools responses
-    if (lowerMessage.includes("tools") || lowerMessage.includes("software")) {
-      return `She works with various tools and technologies including: ${christinahInfo.tools.join(", ")}.`;
+    if (lowerMessage.includes("tools") || lowerMessage.includes("software") || lowerMessage.includes("frameworks")) {
+      return {
+        text: `🛠️ Development Tools & Frameworks\n\n${christinahInfo.tools.map(tool => `• ${tool}`).join('\n')}\n\nChristinah is proficient with modern development workflows, version control, and collaborative development practices. She believes in using the right tool for the job and is always eager to learn new technologies.`
+      };
     }
 
     // Experience responses
-    if (lowerMessage.includes("experience") || lowerMessage.includes("work") || lowerMessage.includes("career")) {
-      return `Christinah has ${christinahInfo.experience.toLowerCase()} building web and mobile applications. She's built a strong technical foundation and is now leveraging it to explore AI.`;
+    if (lowerMessage.includes("experience") || lowerMessage.includes("work") || lowerMessage.includes("career") || lowerMessage.includes("professional")) {
+      return {
+        text: `💼 Professional Experience\n\n${christinahInfo.experience}\n\n🚀 Key Highlights:\n• Developed multiple full-stack web applications\n• Created user-friendly mobile interfaces\n• Implemented secure backend systems\n• Designed intuitive UI/UX experiences\n• Built AI-powered chatbot solutions\n\n🎯 Current Focus:\nTransitioning into AI and machine learning, combining her solid software engineering foundation with cutting-edge AI technologies to create innovative solutions.`
+      };
     }
 
     // Education responses
-    if (lowerMessage.includes("education") || lowerMessage.includes("study") || lowerMessage.includes("university") || lowerMessage.includes("qualification")) {
-      let educationText = "Christinah's educational background:\n\n";
-      christinahInfo.education.forEach(edu => {
-        educationText += `• ${edu.qualification} from ${edu.institution} (${edu.period})\n`;
+    if (lowerMessage.includes("education") || lowerMessage.includes("study") || lowerMessage.includes("university") || lowerMessage.includes("qualification") || lowerMessage.includes("degree")) {
+      let educationText = `🎓 Educational Journey\n\n`;
+      christinahInfo.education.forEach((edu, index) => {
+        const status = edu.period.includes("Progress") ? "🔄" : "✅";
+        educationText += `${status} ${edu.qualification}\n📍 ${edu.institution}\n📅 ${edu.period}\n\n`;
       });
-      return educationText;
+      educationText += `Christinah's educational path demonstrates her commitment to continuous learning and professional development in the rapidly evolving field of technology.`;
+      
+      return { text: educationText };
     }
 
     // Projects responses
-    if (lowerMessage.includes("project") || lowerMessage.includes("portfolio") || lowerMessage.includes("work samples")) {
-      if (lowerMessage.includes("florist")) {
-        const project = christinahInfo.projects.find(p => p.name.toLowerCase().includes("florist"));
-        return `${project?.name}: ${project?.description}\n\nTechnologies: ${project?.technologies.join(", ")}\n\n🌐 Live Demo: ${project?.link}\n📁 GitHub: ${project?.github}`;
-      }
-      if (lowerMessage.includes("ui") || lowerMessage.includes("ux") || lowerMessage.includes("design")) {
-        const project = christinahInfo.projects.find(p => p.name.toLowerCase().includes("ux"));
-        return `${project?.name}: ${project?.description}\n\nTechnologies: ${project?.technologies.join(", ")}\n\n🌐 View Design: ${project?.link}`;
-      }
-      if (lowerMessage.includes("chirper") || lowerMessage.includes("blog")) {
-        const project = christinahInfo.projects.find(p => p.name.toLowerCase().includes("chirper"));
-        return `${project?.name}: ${project?.description}\n\nTechnologies: ${project?.technologies.join(", ")}\n\n📁 GitHub: ${project?.github}`;
-      }
-      if (lowerMessage.includes("tutoring") || lowerMessage.includes("brilliance")) {
-        const project = christinahInfo.projects.find(p => p.name.toLowerCase().includes("brilliance"));
-        return `${project?.name}: ${project?.description}\n\nTechnologies: ${project?.technologies.join(", ")}\n\n🌐 Live Demo: ${project?.link}\n📁 GitHub: ${project?.github}`;
-      }
-      if (lowerMessage.includes("chatbot") || lowerMessage.includes("capaciti")) {
-        const project = christinahInfo.projects.find(p => p.name.toLowerCase().includes("capaciti"));
-        return `${project?.name}: ${project?.description}\n\nTechnologies: ${project?.technologies.join(", ")}\n\n🌐 Try it: ${project?.link}`;
-      }
-      if (lowerMessage.includes("job") || lowerMessage.includes("swiper")) {
-        const project = christinahInfo.projects.find(p => p.name.toLowerCase().includes("job"));
-        return `${project?.name}: ${project?.description}\n\nTechnologies: ${project?.technologies.join(", ")}\n\n🌐 Live Demo: ${project?.link}\n📁 GitHub: ${project?.github}`;
-      }
-      
-      return `Christinah has worked on several impressive projects:\n\n1. Florist Web Application - Angular & Spring Boot e-commerce platform\n2. UX/UI Design - Modern interface designs using Figma\n3. Chirper - Micro-blogging platform with Laravel\n4. Brilliance Tutoring App - Educational platform interface\n5. CAPACITI Chatbot - AI-powered support bot\n6. JobSwipers - Tinder-style job matching platform\n\nAsk about any specific project for more details!`;
+if (lowerMessage.includes("project") || lowerMessage.includes("portfolio") || lowerMessage.includes("work samples")) {
+  // Specific project queries
+  if (lowerMessage.includes("florist")) {
+    const project = christinahInfo.projects[0];
+    const links = [];
+    
+    if (project.link) {
+      links.push({ text: "View Live Demo", url: project.link, type: "demo" as const });
+    }
+    if (project.github) {
+      links.push({ text: "View Code", url: project.github, type: "github" as const });
     }
 
+    return {
+      text: `🌸 ${project.name}\n\n${project.description}\n\n💻 Technologies Used:\n${project.technologies.map(tech => `• ${tech}`).join('\n')}`,
+      links: links.length > 0 ? links : undefined
+    };
+  }
+  
+  if (lowerMessage.includes("ui") || lowerMessage.includes("ux") || lowerMessage.includes("design")) {
+    const project = christinahInfo.projects[1];
+    const links = [];
+    
+    if (project.link) {
+      links.push({ text: "View Design Portfolio", url: project.link, type: "demo" as const });
+    }
+
+    return {
+      text: `🎨 ${project.name}\n\n${project.description}\n\n🛠️ Design Tools:\n${project.technologies.map(tech => `• ${tech}`).join('\n')}`,
+      links: links.length > 0 ? links : undefined
+    };
+  }
+
+  if (lowerMessage.includes("chirper") || lowerMessage.includes("blog") || lowerMessage.includes("social")) {
+    const project = christinahInfo.projects[2];
+    const links = [];
+    
+    if (project.github) {
+      links.push({ text: "View Source Code", url: project.github, type: "github" as const });
+    }
+
+    return {
+      text: `🐦 ${project.name}\n\n${project.description}\n\n⚡ Built With:\n${project.technologies.map(tech => `• ${tech}`).join('\n')}`,
+      links: links.length > 0 ? links : undefined
+    };
+  }
+
+  // General projects overview
+  return {
+    text: `🚀 Project Portfolio\n\nChristinah has built an impressive collection of projects:\n\n${christinahInfo.projects.map((project, index) => 
+      `${index + 1}. ${project.name}\n   ${project.description.substring(0, 80)}...`
+    ).join('\n\n')}\n\n💡 Each project demonstrates different aspects of her technical skills, from full-stack development to UI/UX design and AI implementation.\n\nAsk about any specific project for detailed information!`
+  };
+}
+
     // Contact responses
-    if (lowerMessage.includes("contact") || lowerMessage.includes("hire") || lowerMessage.includes("opportunity") || lowerMessage.includes("available")) {
-      return `Christinah is currently ${christinahInfo.status.toLowerCase()}! You can reach out to her:\n\n📧 Email: ${christinahInfo.contact.email}\n📱 Phone: ${christinahInfo.contact.phone}\n📍 Location: ${christinahInfo.contact.location}\n\n💼 LinkedIn: ${christinahInfo.contact.linkedin}\n🐙 GitHub: ${christinahInfo.contact.github}`;
+    if (lowerMessage.includes("contact") || lowerMessage.includes("hire") || lowerMessage.includes("opportunity") || lowerMessage.includes("available") || lowerMessage.includes("reach")) {
+      return {
+        text: `📞 Get In Touch with Christinah\n\nChristinah is currently ${christinahInfo.status.toLowerCase()} and would love to hear from you!\n\n📧 Email: ${christinahInfo.contact.email}\n📱 Phone: ${christinahInfo.contact.phone}\n📍 Location: ${christinahInfo.contact.location}\n\n🤝 Whether you're looking for a talented developer, AI enthusiast, or collaborator on exciting projects, don't hesitate to reach out!`,
+        links: [
+          { text: "Send Email", url: `mailto:${christinahInfo.contact.email}`, type: "social" },
+          { text: "LinkedIn", url: christinahInfo.contact.linkedin, type: "social" },
+          { text: "GitHub", url: christinahInfo.contact.github, type: "social" }
+        ]
+      };
     }
 
     // Social media responses
-    if (lowerMessage.includes("social") || lowerMessage.includes("media")) {
-      return `Connect with Christinah:\n
-      LinkedIn: ${christinahInfo.contact.linkedin}
-      GitHub: ${christinahInfo.contact.github}
-      Twitter: ${christinahInfo.contact.twitter}
-      Medium: ${christinahInfo.contact.medium}`;
-          }
+    if (lowerMessage.includes("social") || lowerMessage.includes("media") || lowerMessage.includes("linkedin") || lowerMessage.includes("github") || lowerMessage.includes("twitter")) {
+      return {
+        text: `🌐 Connect with Christinah\n\nStay updated with her latest projects and insights:\n\n💼 Professional networking and career updates\n🔧 Code repositories and open-source contributions\n💭 Thoughts on tech trends and AI developments\n📝 Technical articles and tutorials`,
+        links: [
+          { text: "LinkedIn", url: christinahInfo.contact.linkedin, type: "social" },
+          { text: "GitHub", url: christinahInfo.contact.github, type: "social" },
+          { text: "Twitter", url: christinahInfo.contact.twitter, type: "social" },
+          { text: "Medium", url: christinahInfo.contact.medium, type: "social" }
+        ]
+      };
+    }
 
-    // Default responses
-    const defaultResponses = [
-      `I can tell you about Christinah's background, skills, experience, education, or projects. What would you like to know?`,
-      `Feel free to ask me about her technical skills, work experience, education, or current projects!`,
-      `I'm here to help you learn more about Christinah. You can ask about her background, skills, or experience.`,
+    // Location responses
+    if (lowerMessage.includes("location") || lowerMessage.includes("address") || lowerMessage.includes("where") || lowerMessage.includes("based")) {
+      return {
+        text: `📍 Location & Availability\n\nChristinah is based in ${christinahInfo.contact.location}\n\n🌍 She's open to:\n• Remote work opportunities\n• Local Cape Town positions\n• Hybrid work arrangements\n• International collaborations\n\n✈️ Available for relocation for the right opportunity!`,
+        links: [
+          { text: "Contact for Opportunities", url: `mailto:${christinahInfo.contact.email}`, type: "social" }
+        ]
+      };
+    }
+
+    // AI/Machine Learning specific responses
+    if (lowerMessage.includes("ai") || lowerMessage.includes("machine learning") || lowerMessage.includes("deep learning") || lowerMessage.includes("artificial intelligence")) {
+      return {
+        text: `🤖 AI & Machine Learning Journey\n\nChristinah is passionate about artificial intelligence and is actively building expertise in:\n\n🧠 Machine Learning\n• Supervised & Unsupervised Learning\n• Model Training & Evaluation\n• Data Analysis & Preprocessing\n\n🔬 Deep Learning\n• Neural Networks\n• TensorFlow & PyTorch\n• Computer Vision & NLP\n\n💡 Current AI Projects:\n• Natural Language Processing applications\n• Chatbot development (like this one!)\n• Exploring AI integration in web applications\n\nShe believes AI will revolutionize how we solve problems and is excited to be part of this transformation!`
+      };
+    }
+
+    // Status responses
+    if (lowerMessage.includes("status") || lowerMessage.includes("availability") || lowerMessage.includes("job") || lowerMessage.includes("work")) {
+      return {
+        text: `💼 Current Status: ${christinahInfo.status}\n\n🎯 What she's looking for:\n• Software Engineering roles\n• AI/ML positions\n• Full-stack development opportunities\n• Remote or Cape Town-based positions\n• Challenging projects that make an impact\n\n🚀 Ready to contribute to innovative teams and exciting projects!\n\nInterested in working together? Get in touch!`,
+        links: [
+          { text: "Contact Christinah", url: `mailto:${christinahInfo.contact.email}`, type: "social" }
+        ]
+      };
+    }
+
+    // Default helpful response
+    const helpfulResponses = [
+      `🤔 I'd love to help you learn more about Christinah!\n\nTry asking about:\n• Her background and experience\n• Technical skills and tools\n• Project portfolio\n• Education and qualifications\n• Contact information\n• AI and machine learning interests\n\nWhat interests you most?`,
+      `💡 Here are some things I can tell you about Christinah:\n\n👩‍💻 Professional background\n🛠️ Technical expertise\n🚀 Project showcase\n🎓 Educational journey\n📞 How to get in touch\n\nWhat would you like to explore?`,
     ];
-    return defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+    return { text: helpfulResponses[Math.floor(Math.random() * helpfulResponses.length)] };
   };
 
-  const handleChatSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSendMessage = () => {
     if (!chatInput.trim()) return;
 
-    // Add user message
-    const newUserMessage: ChatMessage = {
+    const userMessage: ChatMessage = {
       text: chatInput,
-      isBot: false
+      isBot: false,
+      timestamp: new Date()
     };
-    setChatMessages(prev => [...prev, newUserMessage]);
+
+    setChatMessages(prev => [...prev, userMessage]);
     setChatInput('');
+    setIsTyping(true);
 
-    // Show typing indicator
-    const typingIndicator: ChatMessage = {
-      text: '...',
-      isBot: true
-    };
-    setChatMessages(prev => [...prev, typingIndicator]);
-
-    // Simulate response delay
+    // Simulate typing delay
     setTimeout(() => {
-      // Remove typing indicator
-      setChatMessages(prev => prev.filter(msg => msg.text !== '...'));
-      
-      // Add bot response
       const response = getResponse(chatInput);
       const botMessage: ChatMessage = {
-        text: response,
-        isBot: true
+        text: response.text,
+        isBot: true,
+        timestamp: new Date(),
+        links: response.links
       };
+      
       setChatMessages(prev => [...prev, botMessage]);
-    }, 1000 + Math.random() * 1000);
+      setIsTyping(false);
+    }, 1000 + Math.random() * 1500);
   };
 
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
+  const handleQuickQuestion = (question: string) => {
+    setChatInput(question);
+    setTimeout(() => handleSendMessage(), 100);
   };
+
+ const renderLinks = (links: Array<{ text: string; url?: string; type?: 'demo' | 'github' | 'social' }>) => {
+  if (!links?.length) return null;
+  
+  return (
+    <div className="mt-3 flex flex-wrap gap-2">
+      {links.map((link, index) => (
+        link.url && (
+          <a
+            key={index}
+            href={link.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 px-3 py-1 bg-muted hover:bg-muted/80 text-foreground rounded-full text-xs font-medium transition-colors"
+          >
+            {link.type === 'github' && <Github className="w-3 h-3" />}
+            {link.type === 'social' && <ExternalLink className="w-3 h-3" />}
+            {link.type === 'demo' && <ExternalLink className="w-3 h-3" />}
+            {!link.type && <ExternalLink className="w-3 h-3" />}
+            {link.text}
+          </a>
+        )
+      ))}
+    </div>
+  );
+};
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
@@ -260,96 +357,155 @@ Contact:\n
             initial={{ opacity: 0, scale: 0.8, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 20 }}
-            className="mb-4 w-80 h-[28rem] bg-background border rounded-lg shadow-lg flex flex-col"
+            transition={{ type: "spring", damping: 20, stiffness: 300 }}
+            className="mb-4 w-96 h-[32rem] bg-background rounded-xl shadow-xl border flex flex-col overflow-hidden"
           >
-            <div className="bg-primary text-primary-foreground p-4 rounded-t-lg flex justify-between items-center">
-              <div className="flex items-center space-x-2">
-                <Image 
-                  src="/images/cmm-chatbot-logo.png" 
-                  alt="CMM ChatBot" 
-                  width={24} 
-                  height={24}
-                  className="filter brightness-0 invert"
-                />
-                <span className="font-medium">CMM ChatBot</span>
+            {/* Header */}
+            <div className="bg-primary text-primary-foreground p-4 rounded-t-xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="relative h-10 w-10">
+                    <Image 
+                      src="/images/cmm-chatbot-logo.png" 
+                      alt="CMM ChatBot" 
+                      layout="fill"
+                      objectFit="contain"
+                      className="filter brightness-0 invert"
+                    />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">CMM ChatBot</h3>
+                    <p className="text-primary-foreground/80 text-sm">Ask me about Christinah!</p>
+                  </div>
+                </div>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setChatOpen(false)}
+                  className="text-primary-foreground hover:bg-primary-foreground/20 rounded-full"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
               </div>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={() => setChatOpen(false)}
-                className="h-6 w-6 text-primary-foreground hover:bg-primary-foreground/20"
-              >
-                <X className="h-4 w-4" />
-              </Button>
             </div>
 
-            <div className="flex-1 p-4 overflow-y-auto space-y-4">
+            {/* Quick Questions */}
+            {chatMessages.length === 1 && (
+              <div className="p-3 bg-muted/30 border-b">
+                <p className="text-xs text-muted-foreground mb-2">Quick questions:</p>
+                <div className="flex flex-wrap gap-1">
+                  {quickQuestions.slice(0, 3).map((question, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleQuickQuestion(question)}
+                      className="px-2 py-1 bg-background border border-border rounded-full text-xs text-foreground hover:bg-primary/10 transition-colors"
+                    >
+                      {question}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Messages */}
+            <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-muted/10">
               {chatMessages.map((message, index) => (
-                <div key={index} className={`flex ${message.isBot ? "justify-start" : "justify-end"}`}>
-                  <div
-                    className={`max-w-[80%] p-3 rounded-lg text-sm flex items-start gap-2 ${
-                      message.isBot ? "bg-muted text-foreground" : "bg-primary text-primary-foreground"
-                    }`}
-                  >
-                    {message.isBot && (
-                      <Image 
-                        src="/images/cmm-chatbot-logo.png" 
-                        alt="Bot" 
-                        width={20} 
-                        height={20}
-                        className="flex-shrink-0 mt-0.5 filter brightness-0 invert"
-                      />
-                    )}
-                    <div className="whitespace-pre-line">
-                      {message.text === '...' ? (
-                        <div className="flex space-x-1">
-                          <div className="w-2 h-2 rounded-full bg-foreground animate-bounce" style={{ animationDelay: '0ms' }} />
-                          <div className="w-2 h-2 rounded-full bg-foreground animate-bounce" style={{ animationDelay: '150ms' }} />
-                          <div className="w-2 h-2 rounded-full bg-foreground animate-bounce" style={{ animationDelay: '300ms' }} />
+                <div key={index} className={`flex ${message.isBot ? 'justify-start' : 'justify-end'}`}>
+                  <div className={`max-w-[85%] ${message.isBot ? 'order-2' : 'order-1'}`}>
+                    <div className="flex items-start space-x-2">
+                      {message.isBot && (
+                        <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                          <Bot className="w-4 h-4 text-primary-foreground" />
                         </div>
-                      ) : (
-                        message.text.split('\n').map((paragraph, i) => (
-                          <p key={i}>{paragraph}</p>
-                        ))
+                      )}
+                      <div
+                        className={`px-4 py-3 rounded-xl ${
+                          message.isBot
+                            ? 'bg-background text-foreground border border-border'
+                            : 'bg-primary text-primary-foreground'
+                        }`}
+                      >
+                        <div className="whitespace-pre-line text-sm leading-relaxed">
+                          {message.text}
+                        </div>
+                        {message.isBot && renderLinks(message.links || [])}
+                        <div className={`text-xs mt-2 ${message.isBot ? 'text-muted-foreground' : 'text-primary-foreground/80'}`}>
+                          {message.timestamp?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                      </div>
+                      {!message.isBot && (
+                        <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                          <User className="w-4 h-4 text-foreground" />
+                        </div>
                       )}
                     </div>
                   </div>
                 </div>
               ))}
+
+              {/* Typing Indicator */}
+              {isTyping && (
+                <div className="flex justify-start">
+                  <div className="flex items-start space-x-2">
+                    <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                      <Bot className="w-4 h-4 text-primary-foreground" />
+                    </div>
+                    <div className="bg-background px-4 py-3 rounded-xl border border-border">
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                        <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
               <div ref={messagesEndRef} />
             </div>
 
-            <form onSubmit={handleChatSubmit} className="p-4 border-t flex space-x-2">
-              <input
-                type="text"
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                placeholder="Ask about Christinah..."
-                className="flex-1 px-3 py-2 border border-input rounded-md bg-background text-sm"
-              />
-              <Button type="submit" size="icon" disabled={!chatInput.trim()}>
-                <Send className="h-4 w-4" />
-              </Button>
-            </form>
+            {/* Input */}
+            <div className="p-4 bg-background border-t border-border">
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  placeholder="Ask me anything about Christinah..."
+                  className="flex-1 px-4 py-2 border border-input rounded-full focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent text-sm"
+                  disabled={isTyping}
+                />
+                <Button
+                  onClick={handleSendMessage}
+                  disabled={!chatInput.trim() || isTyping}
+                  size="sm"
+                  className="rounded-full px-4 bg-primary hover:bg-primary/90"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <Button 
-        size="icon" 
-        onClick={() => setChatOpen(!chatOpen)} 
-        className="h-12 w-12 rounded-full shadow-lg bg-primary hover:bg-primary/90"
+      {/* Toggle Button */}
+      <Button
+        onClick={() => setChatOpen(!chatOpen)}
+        className="w-14 h-14 rounded-full shadow-lg bg-primary hover:bg-primary/90 transition-all duration-300"
       >
         {chatOpen ? (
-          <X className="h-5 w-5 text-primary-foreground" />
+          <X className="h-6 w-6 text-primary-foreground" />
         ) : (
-          <Image 
-            src="/images/cmm-chatbot-logo.png" 
-            alt="Chatbot" 
-            width={24} 
-            height={24}
-            className="filter brightness-0 invert"
-          />
+          <div className="relative h-6 w-6">
+            <Image 
+              src="/images/cmm-chatbot-logo.png" 
+              alt="Chatbot" 
+              layout="fill"
+              objectFit="contain"
+              className="filter brightness-0 invert"
+            />
+          </div>
         )}
       </Button>
     </div>

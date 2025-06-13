@@ -113,11 +113,16 @@ html {
   border-radius: 0.75rem;
   font-size: 0.875rem;
   line-height: 1.4;
+    white-space: pre-line;
+  word-break: break-word;
 }
 
 .message.bot .message-content {
   background: hsl(var(--muted));
   color: hsl(var(--foreground));
+  max-width: 100%;
+  word-break: break-word;
+  white-space: pre-wrap;
 }
 
 .message.user .message-content {
