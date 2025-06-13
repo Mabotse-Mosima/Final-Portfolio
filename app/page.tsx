@@ -159,7 +159,7 @@ const projects = [
     title: "StackSubChatBot",
     description:
       "The platform promotes a free 15-day trial with no credit card required, making it easy for users to get started. With a modern, user-friendly interface and a focus on simplifying communication, StackSubstitute helps businesses improve customer support through intelligent, automated interactions.",
-    image: "/images/stack.png",
+    image: "/images/stack.PNG",
     tags: ["HTML5", "CSS", "JavaScript", "bootstrap"],
     liveUrl: "https://sage-capybara-70004a.netlify.app/",
     githubUrl: "https://github.com/Mabotse-Mosima/StackSubChatBot",
@@ -169,7 +169,7 @@ const projects = [
     id: 9,
     title: "Serene",
     description: "An AI-powered mental health companion that listens, supports, and talks to you when you need someone most",
-    image: "/images/Capture.png",
+    image: "/images/Capture.PNG",
     tags: ["TypeScript", "React", "Next.js", "Tailwind"],
     liveUrl: "https://v0-new-project-1by3kcnk7kn.vercel.app/",
     githubUrl: "https://github.com/Mabotse-Mosima/serene",
